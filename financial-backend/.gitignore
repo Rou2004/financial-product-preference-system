@@ -1,0 +1,81 @@
+# ==========================================
+# Frontend - Vue.js / Vite
+# ==========================================
+
+# Node modules
+financial-frontend/node_modules/
+node_modules/
+
+# pnpm / npm cache
+financial-frontend/.pnpm-store/
+.pnpm-store/
+.npm/
+
+# Build output
+financial-frontend/dist/
+dist/
+
+# Environment variables
+financial-frontend/.env.local
+financial-frontend/.env.*.local
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==========================================
+# Backend - Java / Spring Boot / Gradle
+# ==========================================
+
+# Gradle cache / build
+financial-backend/.gradle/
+financial-backend/build/
+.gradle/
+build/
+
+# Local application config
+financial-backend/src/main/resources/application-local.properties
+financial-backend/src/main/resources/application-local.yml
+
+# Java compiled files
+*.class
+
+# ==========================================
+# IDE / Editor
+# ==========================================
+
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+gen/
+
+# VS Code
+.vscode/
+
+# ==========================================
+# OS Files
+# ==========================================
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# ==========================================
+# Optional
+# ==========================================
+
+# Coverage / cache
+coverage/
+.cache/
+
+# Temporary files
+*.tmp
+*.temp
