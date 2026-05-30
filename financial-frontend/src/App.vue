@@ -17,7 +17,6 @@
       </template>
 
       <el-table :data="favoriteList" border style="width: 100%" v-loading="loading">
-        <el-table-column prop="sn" label="序號" width="70" align="center" />
         <el-table-column prop="productName" label="金融商品名稱" min-width="150">
           <template #default="scope">
             <span v-html="sanitizeContent(scope.row.productName)"></span>
@@ -25,7 +24,7 @@
         </el-table-column>
         <el-table-column prop="account" label="扣款帳號" width="140" align="center" />
         <el-table-column prop="purchaseQuantity" label="購買數量" width="100" align="right" />
-        <el-table-column prop="totalFee" label="手續費 (元)" width="120" align="right">
+        <el-table-column prop="totalFee" label="總手續費用 (元)" width="120" align="right">
           <template #default="scope">
             $ {{ formatNumber(scope.row.totalFee) }}
           </template>
@@ -35,7 +34,7 @@
             <strong>$ {{ formatNumber(scope.row.totalAmount) }}</strong>
           </template>
         </el-table-column>
-        <el-table-column prop="email" label="聯絡通知信箱" min-width="160">
+        <el-table-column prop="email" label="聯絡電子信箱" min-width="160">
           <template #default="scope">
             <span v-html="sanitizeContent(scope.row.email)"></span>
           </template>
@@ -55,7 +54,12 @@
         <el-form-item label="使用者 ID" v-if="!isEdit">
           <el-input v-model="form.userId" disabled />
         </el-form-item>
-        
+        <el-form-item label="使用者名稱" v-if="!isEdit">
+          <el-input v-model="form.userName" disabled />
+        </el-form-item>
+        <el-form-item label="扣款帳號" v-if="!isEdit">
+          <el-input v-model="form.account" disabled />
+        </el-form-item>
         <el-form-item label="選擇金融商品" v-if="!isEdit">
           <el-select v-model="form.productNo" placeholder="請選擇金融商品" style="width: 100%">
             <el-option
@@ -94,7 +98,9 @@ import DOMPurify from 'dompurify';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
 // 響應式變數設定
-const userId = ref('A1236456789');
+const userId = ref('');
+const userName = ref('');
+const account = ref('');
 const favoriteList = ref([]);
 const dbProducts = ref([]);
 const loading = ref(false);
@@ -104,6 +110,8 @@ const currentSn = ref(null);
 
 const form = ref({
   userId: '',
+  userName: '',
+  account: '',
   productNo: null,
   purchaseQuantity: 10
 });
@@ -129,18 +137,34 @@ const estimatedSubTotal = computed(() => {
   return selectedProductInfo.value.Price * form.value.purchaseQuantity;
 });
 
-// 查詢喜好清單
+// 查詢喜好清單 (按下查詢按鈕觸發)
 const fetchFavorites = async () => {
   if (!userId.value.trim()) {
     ElMessage.warning('請先輸入使用者 ID');
     return;
   }
+  
   loading.value = true;
   try {
+    // 撈取喜好商品表格清單
     const res = await favoriteApi.getFavorites(userId.value);
     favoriteList.value = res.data;
+    
+    // 撈取此 ID 的使用者真實基本資料
+    const userRes = await favoriteApi.getUserInfo(userId.value);
+    if (userRes.data) {
+      // 對齊後端 SQL 查出來的欄位名稱（通常轉成 JSON 後會對應資料庫欄位或小駝峰）
+      userName.value = userRes.data.UserName || userRes.data.userName;
+      account.value = userRes.data.Account || userRes.data.account;
+    }
+
+    ElMessage.success('已成功查詢！');
   } catch (error) {
-    console.error(error);
+    console.error('查詢失敗:', error);
+    // 防呆：如果查無此人，把欄位清空，避免殘留上一個人的名字
+    userName.value = '';
+    account.value = '';
+    ElMessage.error('查無此使用者基本資料，請確認 ID 是否正確');
   } finally {
     loading.value = false;
   }
@@ -148,12 +172,22 @@ const fetchFavorites = async () => {
 
 // 開啟新增彈窗
 const openAddDialog = () => {
+  // 防呆：如果全域變數裡還沒有撈到使用者名稱，代表他沒按查詢，或者是個無效的 ID
+  if (!userId.value.trim() || !userName.value) {
+    ElMessage.warning('請先輸入正確的使用者 ID 並按下查詢，再進行新增');
+    return;
+  }
+
   isEdit.value = false;
+  
   form.value = {
     userId: userId.value,
-    productNo: dbProducts.value.length > 0 ? dbProducts.value[0].ProductNo : null, // 預選第一個商品
+    userName: userName.value,
+    account: account.value,
+    productNo: dbProducts.value.length > 0 ? dbProducts.value[0].ProductNo : null,
     purchaseQuantity: 10
   };
+  
   dialogVisible.value = true;
 };
 

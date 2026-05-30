@@ -23,6 +23,20 @@ public class FavoriteProductRepository {
     }
 
     /**
+     * 根據 UserID 查詢使用者的真實姓名與扣款帳號
+     */
+    public Map<String, Object> getUserInfoById(String userId) {
+        String sql = "SELECT UserName, Account FROM User WHERE UserID = ?";
+
+        try {
+            return jdbcTemplate.queryForMap(sql, userId);
+        } catch (Exception e) {
+            // 萬一查無此人，回傳空 Map 避免後端噴 500 錯誤
+            return new java.util.HashMap<>();
+        }
+    }
+
+    /**
      * 呼叫 sp_GetFavoriteProducts 預存程序
      * @param userId 使用者 ID
      * @return 喜好商品清單

@@ -1,6 +1,11 @@
 import request from './request';
 
 export const favoriteApi = {
+    // 查詢使用者資訊 (GET /favorites/{userId}/user-info)
+    getUserInfo(userId) {
+        return request.get(`/favorites/${userId}/user-info`);
+    },
+
     // 查詢喜好清單 (GET /favorites?userId=...)
     getFavorites(userId) {
         return request.get('/favorites', { params: { userId } });

@@ -17,6 +17,10 @@ public class FavoriteProductService {
         this.favoriteProductRepository = favoriteProductRepository;
     }
 
+    public Map<String, Object> getUserInfo(String userId) {
+        return favoriteProductRepository.getUserInfoById(userId);
+    }
+
     /**
      * 查詢喜好商品清單
      */

@@ -20,13 +20,23 @@ public class FavoriteProductController {
         this.favoriteProductService = favoriteProductService;
     }
 
+
     /**
-     * 查詢喜好商品清單 (補回這個原本漏掉的核心功能！)
+     * 查詢喜好商品清單
      * URL: GET http://localhost:8080/api/favorites?userId=A1236456789
      */
     @GetMapping
     public ResponseEntity<List<FavoriteProductDto>> getFavoriteProducts(@RequestParam String userId) {
         return ResponseEntity.ok(favoriteProductService.getFavoriteProducts(userId));
+    }
+
+    @GetMapping("/{userId}/user-info")
+    public ResponseEntity<Map<String, Object>> getUserInfo(@PathVariable String userId) {
+        Map<String, Object> userInfo = favoriteProductService.getUserInfo(userId);
+        if (userInfo.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(userInfo);
     }
 
     /**
@@ -45,6 +55,7 @@ public class FavoriteProductController {
     @PostMapping
     public ResponseEntity<String> addFavoriteProduct(@RequestBody Map<String, Object> payload) {
         String userId = (String) payload.get("userId");
+        String Account = (String) payload.get("Account");
         Integer productNo = (Integer) payload.get("productNo");
         Integer purchaseQuantity = (Integer) payload.get("purchaseQuantity");
 
