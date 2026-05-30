@@ -1,6 +1,11 @@
 import request from './request';
 
 export const favoriteApi = {
+    // 使用者登入 (POST /favorites/login)
+    login(userId, password) {
+        return request.post('/favorites/login', { userId, password });
+    },
+
     // 查詢使用者資訊 (GET /favorites/{userId}/user-info)
     getUserInfo(userId) {
         return request.get(`/favorites/${userId}/user-info`);

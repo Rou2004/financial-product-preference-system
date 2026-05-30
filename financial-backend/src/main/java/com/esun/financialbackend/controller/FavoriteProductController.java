@@ -1,5 +1,6 @@
 package com.esun.financialbackend.controller;
 
+import com.esun.financialbackend.dto.LoginRequestDto;
 import com.esun.financialbackend.dto.FavoriteProductDto;
 import com.esun.financialbackend.service.FavoriteProductService;
 import org.springframework.http.HttpStatus;
@@ -46,6 +47,30 @@ public class FavoriteProductController {
     @GetMapping("/products")
     public ResponseEntity<List<Map<String, Object>>> getProductList() {
         return ResponseEntity.ok(favoriteProductService.getProductList());
+    }
+
+
+    /**
+     * 使用者登入接口
+     * URL: POST http://localhost:8080/api/favorites/login
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginDto) {
+        if (loginDto.getUserId() == null || loginDto.getUserId().trim().isEmpty() ||
+                loginDto.getPassword() == null || loginDto.getPassword().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("帳號與密碼不可為空！");
+        }
+
+        Map<String, Object> loginUser = favoriteProductService.loginCheck(
+                loginDto.getUserId().trim(),
+                loginDto.getPassword()
+        );
+
+        if (loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("帳號或密碼錯誤");
+        }
+
+        return ResponseEntity.ok(loginUser);
     }
 
     /**

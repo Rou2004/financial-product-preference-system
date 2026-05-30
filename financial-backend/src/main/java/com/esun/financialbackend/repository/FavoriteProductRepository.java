@@ -23,6 +23,18 @@ public class FavoriteProductRepository {
     }
 
     /**
+     * 根據 UserID 查詢完整登入資訊
+     */
+    public Map<String, Object> getLoginInfoById(String userId) {
+        String sql = "SELECT UserID AS userId, UserName AS userName, Password AS password FROM User WHERE UserID = ?";
+        try {
+            return jdbcTemplate.queryForMap(sql, userId);
+        } catch (Exception e) {
+            return new java.util.HashMap<>();
+        }
+    }
+
+    /**
      * 根據 UserID 查詢使用者的真實姓名與扣款帳號
      */
     public Map<String, Object> getUserInfoById(String userId) {

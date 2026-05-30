@@ -17,6 +17,26 @@ public class FavoriteProductService {
         this.favoriteProductRepository = favoriteProductRepository;
     }
 
+    /**
+     * 登入驗證邏輯
+     */
+    public Map<String, Object> loginCheck(String userId, String inputPassword) {
+        Map<String, Object> userMap = favoriteProductRepository.getLoginInfoById(userId);
+
+        if (userMap == null || userMap.isEmpty()) {
+            System.out.println("找不到該帳號: " + userId);
+            return null;
+        }
+        String dbPassword = (String) userMap.get("password");
+        System.out.println("帳號: " + userId + " | 輸入密碼: " + inputPassword + " | 資料庫密碼: " + dbPassword);
+
+        if (dbPassword != null && dbPassword.equals(inputPassword)) {
+            userMap.remove("password");
+            return userMap;
+        }
+        return null;
+    }
+
     public Map<String, Object> getUserInfo(String userId) {
         return favoriteProductRepository.getUserInfoById(userId);
     }
@@ -37,11 +57,9 @@ public class FavoriteProductService {
      */
     @Transactional
     public void addFavoriteProduct(String userId, Integer productNo, Integer purchaseQuantity) {
-        // 簡單的業務邏輯檢核
         if (purchaseQuantity == null || purchaseQuantity <= 0) {
             throw new IllegalArgumentException("購買數量必須大於 0");
         }
-
         favoriteProductRepository.addFavoriteProduct(userId, productNo, purchaseQuantity);
     }
 
